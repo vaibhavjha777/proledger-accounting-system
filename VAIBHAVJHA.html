@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>ProLedger | Register + Login + Customer Receipt System</title>
+    <!-- Google Fonts + Font Awesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #0f2b4d 0%, #1b4a7a 100%);
+        }
+
+        /* Auth Pages Container */
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .auth-box {
+            background: white;
+            border-radius: 2rem;
+            padding: 2rem;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            animation: fadeInUp 0.5s ease;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+
+        .auth-box h2 {
+            text-align: center;
+            color: #1e3a5f;
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-box .sub {
+            text-align: center;
+            color: #6b7280;
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #374151;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 1rem;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #1e3a5f;
+            box-shadow: 0 0 0 3px rgba(30,58,95,0.1);
+        }
+
+        .auth-btn {
+            width: 100%;
+            background: #1e3a5f;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 1rem;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 0.5rem;
+        }
+
+        .auth-btn:hover {
+            background: #0f2b4d;
+            transform: scale(0.98);
+        }
+
+        .toggle-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #6b7280;
+            font-size: 0.85rem;
+        }
+
+        .toggle-link span {
+            color: #1e3a5f;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .error-msg {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 10px;
+            border-radius: 1rem;
+            margin-top: 1rem;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        .success-msg {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 10px;
+            border-radius: 1rem;
+            margin-top: 1rem;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        /* Main App Styles */
+        .app-container {
+            display: none;
+            background: linear-gradient(145deg, #f0f4fa 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .top-bar {
+            background: white;
+            border-radius: 2rem;
+            padding: 0.8rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .logo h2 {
+            background: linear-gradient(135deg, #0f2b4d, #1b4a7a);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .welcome-text {
+            background: #e2e8f0;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        .logout-btn {
+            background: #dc2626;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .live-datetime {
+            background: #1e3a5f;
+            color: white;
+            padding: 0.5rem 1.2rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            font-family: monospace;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 0.8rem;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .stat-card i { font-size: 1.6rem; color: #1e4a76; }
+        .stat-card .value { font-size: 1.3rem; font-weight: 800; color: #0b2b44; }
+        .stat-card .label { font-size: 0.7rem; text-transform: uppercase; color: #5a6e8a; }
+
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #cbd5e1;
+            padding-bottom: 0.5rem;
+        }
+
+        .tab-btn {
+            background: transparent;
+            color: #475569;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 2rem;
+            width: auto;
+            transition: 0.2s;
+        }
+
+        .tab-btn.active {
+            background: #1e3a5f;
+            color: white;
+        }
+
+        .tab-pane {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-pane.active-pane {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+
+        .two-col {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .col-box {
+            flex: 1;
+            min-width: 320px;
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.2rem;
+            box-shadow: 0 8px 22px rgba(0,0,0,0.08);
+        }
+
+        .col-box h3 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            border-left: 4px solid;
+            padding-left: 12px;
+        }
+
+        .online-title { border-left-color: #10b981; }
+        .offline-title { border-left-color: #f59e0b; }
+
+        .form-row {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.8rem;
+        }
+
+        input, button {
+            padding: 10px 12px;
+            border-radius: 1rem;
+            border: 1px solid #d1d5db;
+            font-size: 0.85rem;
+        }
+
+        button {
+            background: #1e3a5f;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        button:hover { opacity: 0.9; transform: scale(0.97); }
+
+        .records-list {
+            max-height: 450px;
+            overflow-y: auto;
+            margin-top: 1rem;
+        }
+
+        .customer-card {
+            background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-bottom: 12px;
+            border-left: 4px solid #4f46e5;
+        }
+
+        .customer-total {
+            background: #4f46e5;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 2rem;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .receipt-btn-sm {
+            background: #2c5f8a;
+            padding: 6px 14px;
+            font-size: 0.75rem;
+            width: auto;
+        }
+
+        .delete-btn {
+            background: #b91c1c;
+            padding: 6px 14px;
+            font-size: 0.75rem;
+            width: auto;
+            margin-left: 8px;
+        }
+
+        .expense-item {
+            background: #fff7ed;
+            border-left: 3px solid #ef4444;
+            border-radius: 1rem;
+            padding: 0.8rem;
+            margin-bottom: 10px;
+        }
+
+        .trans-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.7rem;
+        }
+        .trans-table th, .trans-table td {
+            border-bottom: 1px solid #e2e8f0;
+            padding: 6px 4px;
+            text-align: left;
+        }
+
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 1.8rem;
+            max-width: 700px;
+            width: 90%;
+            padding: 1.5rem;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .professional-receipt {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+        }
+
+        .receipt-header {
+            text-align: center;
+            border-bottom: 2px solid #1e3a5f;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .receipt-header h1 {
+            color: #1e3a5f;
+            font-size: 1.5rem;
+        }
+
+        .receipt-details {
+            margin: 1rem 0;
+        }
+
+        .receipt-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+
+        @media (max-width: 700px) {
+            body { padding: 0; }
+            .form-row { flex-direction: column; }
+            .top-bar { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+    <!-- REGISTER PAGE -->
+    <div id="registerPage" class="auth-container">
+        <div class="auth-box">
+            <h2><i class="fas fa-user-plus"></i> Create Account</h2>
+            <div class="sub">Register to start using ProLedger</div>
+            <div class="input-group">
+                <label><i class="fas fa-user"></i> Full Name</label>
+                <input type="text" id="regFullname" placeholder="Enter your full name">
+            </div>
+            <div class="input-group">
+                <label><i class="fas fa-envelope"></i> Username</label>
+                <input type="text" id="regUsername" placeholder="Choose a username">
+            </div>
+            <div class="input-group">
+                <label><i class="fas fa-lock"></i> Password</label>
+                <input type="password" id="regPassword" placeholder="Create password">
+            </div>
+            <div class="input-group">
+                <label><i class="fas fa-lock"></i> Confirm Password</label>
+                <input type="password" id="regConfirmPassword" placeholder="Confirm password">
+            </div>
+            <button class="auth-btn" id="registerBtn"><i class="fas fa-user-check"></i> Register</button>
+            <div class="toggle-link">Already have an account? <span id="gotoLogin">Login here</span></div>
+            <div id="registerError" class="error-msg" style="display:none;"></div>
+        </div>
+    </div>
+
+    <!-- LOGIN PAGE -->
+    <div id="loginPage" class="auth-container" style="display:none;">
+        <div class="auth-box">
+            <h2><i class="fas fa-sign-in-alt"></i> Welcome Back</h2>
+            <div class="sub">Login to your ProLedger account</div>
+            <div class="input-group">
+                <label><i class="fas fa-user"></i> Username</label>
+                <input type="text" id="loginUsername" placeholder="Enter username">
+            </div>
+            <div class="input-group">
+                <label><i class="fas fa-lock"></i> Password</label>
+                <input type="password" id="loginPassword" placeholder="Enter password">
+            </div>
+            <button class="auth-btn" id="loginBtn"><i class="fas fa-key"></i> Login</button>
+            <div class="toggle-link">Don't have an account? <span id="gotoRegister">Register here</span></div>
+            <div id="loginError" class="error-msg" style="display:none;"></div>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div id="mainApp" class="app-container">
+        <div class="container">
+            <div class="top-bar">
+                <div class="logo">
+                    <h2><i class="fas fa-crown"></i> ProLedger</h2>
+                </div>
+                <div class="user-info">
+                    <div class="welcome-text" id="welcomeUser"><i class="fas fa-user-circle"></i> Welcome, User</div>
+                    <div class="live-datetime" id="liveDateTime">
+                        <i class="fas fa-calendar-alt"></i> Loading...
+                    </div>
+                    <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card"><i class="fas fa-boxes"></i><div class="value" id="totalItems">0</div><div class="label">Total Items</div></div>
+                <div class="stat-card"><i class="fas fa-wifi"></i><div class="value" id="totalOnline">₹0</div><div class="label">Online Income</div></div>
+                <div class="stat-card"><i class="fas fa-store"></i><div class="value" id="totalOffline">₹0</div><div class="label">Offline Income</div></div>
+                <div class="stat-card"><i class="fas fa-users"></i><div class="value" id="totalCustomers">0</div><div class="label">Unique Customers</div></div>
+                <div class="stat-card"><i class="fas fa-chart-line"></i><div class="value" id="netProfit">₹0</div><div class="label">Net Profit</div></div>
+            </div>
+
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="transactions"><i class="fas fa-plus-circle"></i> Add Transaction</button>
+                <button class="tab-btn" data-tab="customers"><i class="fas fa-users"></i> Customers</button>
+                <button class="tab-btn" data-tab="expenses"><i class="fas fa-money-bill-wave"></i> Expenses</button>
+                <button class="tab-btn" data-tab="reports"><i class="fas fa-chart-bar"></i> Reports</button>
+            </div>
+
+            <div id="transactions" class="tab-pane active-pane">
+                <div class="two-col">
+                    <div class="col-box">
+                        <h3 class="online-title"><i class="fas fa-globe"></i> Online Transaction</h3>
+                        <div class="form-row">
+                            <input type="text" id="onlineName" placeholder="Customer Name">
+                            <input type="text" id="onlineCustomId" placeholder="Customer ID (same ID = same customer)">
+                        </div>
+                        <div class="form-row">
+                            <input type="number" id="onlineQty" placeholder="Items Qty">
+                            <input type="number" id="onlineAmount" placeholder="Amount ₹">
+                        </div>
+                        <button id="addOnlineBtn"><i class="fas fa-cloud-upload-alt"></i> Add Online</button>
+                    </div>
+                    <div class="col-box">
+                        <h3 class="offline-title"><i class="fas fa-store"></i> Offline Transaction</h3>
+                        <div class="form-row">
+                            <input type="text" id="offlineName" placeholder="Customer Name">
+                            <input type="text" id="offlineCustomId" placeholder="Customer ID (same ID = same customer)">
+                        </div>
+                        <div class="form-row">
+                            <input type="number" id="offlineQty" placeholder="Items Qty">
+                            <input type="number" id="offlineAmount" placeholder="Amount ₹">
+                        </div>
+                        <button id="addOfflineBtn"><i class="fas fa-building"></i> Add Offline</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="customers" class="tab-pane">
+                <div class="col-box">
+                    <h3><i class="fas fa-id-card"></i> All Customers (Online + Offline Combined)</h3>
+                    <div id="customersList" class="records-list"></div>
+                </div>
+            </div>
+
+            <div id="expenses" class="tab-pane">
+                <div class="col-box" style="max-width: 650px; margin: 0 auto;">
+                    <h3><i class="fas fa-receipt"></i> Record Expense</h3>
+                    <div class="form-row">
+                        <input type="text" id="expenseReason" placeholder="Reason (Transport, Rent, etc.)">
+                        <input type="number" id="expenseAmount" placeholder="Amount ₹">
+                    </div>
+                    <button id="addExpenseBtn"><i class="fas fa-save"></i> Add Expense</button>
+                    <div class="records-list" id="expenseList"></div>
+                </div>
+            </div>
+
+            <div id="reports" class="tab-pane">
+                <div class="two-col">
+                    <div class="col-box">
+                        <h3><i class="fas fa-calendar-day"></i> Today's Report</h3>
+                        <div id="todayReportContainer" style="background:#fef9e3; border-radius:1rem; padding:1rem;"></div>
+                        <button id="printTodayBtn" style="margin-top:1rem; background:#10b981;"><i class="fas fa-print"></i> Print Today</button>
+                    </div>
+                    <div class="col-box">
+                        <h3><i class="fas fa-calendar-alt"></i> This Month's Report</h3>
+                        <div id="monthReportContainer" style="background:#fef9e3; border-radius:1rem; padding:1rem;"></div>
+                        <button id="printMonthBtn" style="margin-top:1rem; background:#10b981;"><i class="fas fa-print"></i> Print Month</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Receipt Modal -->
+    <div id="receiptModal" class="modal">
+        <div class="modal-content" id="modalReceiptInner"></div>
+    </div>
+
+    <script>
+        // ==================== USER MANAGEMENT ====================
+        let currentUser = null;
+
+        function getUsers() {
+            const users = localStorage.getItem("proledger_users");
+            return users ? JSON.parse(users) : [];
+        }
+
+        function saveUsers(users) {
+            localStorage.setItem("proledger_users", JSON.stringify(users));
+        }
+
+        function register() {
+            const fullname = document.getElementById("regFullname").value.trim();
+            const username = document.getElementById("regUsername").value.trim();
+            const password = document.getElementById("regPassword").value;
+            const confirmPassword = document.getElementById("regConfirmPassword").value;
+            const errorDiv = document.getElementById("registerError");
+
+            if (!fullname || !username || !password) {
+                errorDiv.style.display = "block";
+                errorDiv.innerHTML = "<i class='fas fa-exclamation-triangle'></i> All fields are required!";
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                errorDiv.style.display = "block";
+                errorDiv.innerHTML = "<i class='fas fa-exclamation-triangle'></i> Passwords do not match!";
+                return;
+            }
+
+            if (password.length < 4) {
+                errorDiv.style.display = "block";
+                errorDiv.innerHTML = "<i class='fas fa-exclamation-triangle'></i> Password must be at least 4 characters!";
+                return;
+            }
+
+            const users = getUsers();
+            if (users.find(u => u.username === username)) {
+                errorDiv.style.display = "block";
+                errorDiv.innerHTML = "<i class='fas fa-exclamation-triangle'></i> Username already exists!";
+                return;
+            }
+
+            const newUser = {
+                id: Date.now(),
+                fullname: fullname,
+                username: username,
+                password: password,
+                createdAt: new Date().toISOString()
+            };
+
+            users.push(newUser);
+            saveUsers(users);
+
+            errorDiv.style.display = "block";
+            errorDiv.className = "success-msg";
+            errorDiv.innerHTML = "<i class='fas fa-check-circle'></i> Registration successful! Please login.";
+            
+            setTimeout(() => {
+                showLogin();
+            }, 1500);
+        }
+
+        function login() {
+            const username = document.getElementById("loginUsername").value.trim();
+            const password = document.getElementById("loginPassword").value;
+            const errorDiv = document.getElementById("loginError");
+
+            const users = getUsers();
+            const user = users.find(u => u.username === username && u.password === password);
+
+            if (user) {
+                currentUser = user;
+                localStorage.setItem("proledger_current_user", JSON.stringify(user));
+                errorDiv.style.display = "none";
+                loadUserData();
+                showMainApp();
+            } else {
+                errorDiv.style.display = "block";
+                errorDiv.innerHTML = "<i class='fas fa-exclamation-triangle'></i> Invalid username or password!";
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem("proledger_current_user");
+            showLogin();
+        }
+
+        function showRegister() {
+            document.getElementById("registerPage").style.display = "flex";
+            document.getElementById("loginPage").style.display = "none";
+            document.getElementById("mainApp").style.display = "none";
+            document.getElementById("registerError").style.display = "none";
+            document.getElementById("regFullname").value = "";
+            document.getElementById("regUsername").value = "";
+            document.getElementById("regPassword").value = "";
+            document.getElementById("regConfirmPassword").value = "";
+        }
+
+        function showLogin() {
+            document.getElementById("registerPage").style.display = "none";
+            document.getElementById("loginPage").style.display = "flex";
+            document.getElementById("mainApp").style.display = "none";
+            document.getElementById("loginError").style.display = "none";
+            document.getElementById("loginUsername").value = "";
+            document.getElementById("loginPassword").value = "";
+        }
+
+        function showMainApp() {
+            document.getElementById("registerPage").style.display = "none";
+            document.getElementById("loginPage").style.display = "none";
+            document.getElementById("mainApp").style.display = "block";
+            document.getElementById("welcomeUser").innerHTML = `<i class="fas fa-user-circle"></i> Welcome, ${currentUser.fullname}`;
+            initializeApp();
+        }
+
+        // Check auto login
+        function checkAutoLogin() {
+            const savedUser = localStorage.getItem("proledger_current_user");
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                loadUserData();
+                showMainApp();
+            } else {
+                showLogin();
+            }
+        }
+
+        // ==================== USER SPECIFIC DATA ====================
+        let allTransactions = [];
+        let expenses = [];
+
+        function getUserDataKey() {
+            return `proledger_data_${currentUser.username}`;
+        }
+
+        function loadUserData() {
+            const data = localStorage.getItem(getUserDataKey());
+            if (data) {
+                const parsed = JSON.parse(data);
+                allTransactions = parsed.transactions || [];
+                expenses = parsed.expenses || [];
+            } else {
+                allTransactions = [];
+                expenses = [];
+            }
+        }
+
+        function saveUserData() {
+            const data = {
+                transactions: allTransactions,
+                expenses: expenses
+            };
+            localStorage.setItem(getUserDataKey(), JSON.stringify(data));
+        }
+
+        // Helper functions
+        function getCurrentDateStr() {
+            const d = new Date();
+            return d.toISOString().split('T')[0];
+        }
+
+        function getCurrentTimeStr() {
+            const d = new Date();
+            return d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+
+        function getCurrentMonthStr() {
+            const d = new Date();
+            return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+        }
+
+        function getOrCreateID(customId) {
+            if (customId && customId.trim() !== "") {
+                return customId.trim();
+            }
+            return "CUST_" + Date.now() + "_" + Math.floor(Math.random() * 10000);
+        }
+
+        function addTransaction(mode, name, customId, qty, amount) {
+            if (!name.trim()) { alert("❌ Customer name required"); return false; }
+            if (qty <= 0 || isNaN(qty)) { alert("❌ Valid items quantity required"); return false; }
+            if (amount <= 0 || isNaN(amount)) { alert("❌ Valid amount required"); return false; }
+
+            const finalId = getOrCreateID(customId);
+            const now = new Date();
+            const transaction = {
+                id: finalId,
+                name: name.trim(),
+                items: parseInt(qty),
+                amount: parseFloat(amount),
+                mode: mode === 'online' ? 'Online' : 'Offline',
+                date: getCurrentDateStr(),
+                time: getCurrentTimeStr(),
+                timestamp: now.getTime()
+            };
+            allTransactions.unshift(transaction);
+            saveUserData();
+            renderAll();
+            return true;
+        }
+
+        function addExpense(reason, amount) {
+            if (!reason.trim()) { alert("❌ Reason required"); return false; }
+            if (amount <= 0 || isNaN(amount)) { alert("❌ Valid amount required"); return false; }
+            const exp = {
+                id: Date.now(),
+                reason: reason.trim(),
+                amount: parseFloat(amount),
+                date: getCurrentDateStr(),
+                time: getCurrentTimeStr(),
+                timestamp: Date.now()
+            };
+            expenses.unshift(exp);
+            saveUserData();
+            renderExpenses();
+            updateStats();
+            refreshReports();
+            return true;
+        }
+
+        function deleteTransaction(index) {
+            allTransactions.splice(index, 1);
+            saveUserData();
+            renderAll();
+        }
+
+        function deleteExpense(index) {
+            expenses.splice(index, 1);
+            saveUserData();
+            renderExpenses();
+            updateStats();
+            refreshReports();
+        }
+
+        function getCustomersGrouped() {
+            const customerMap = new Map();
+            allTransactions.forEach(t => {
+                if (!customerMap.has(t.id)) {
+                    customerMap.set(t.id, {
+                        id: t.id,
+                        name: t.name,
+                        totalItems: 0,
+                        totalAmount: 0,
+                        transactions: [],
+                        modes: new Set()
+                    });
+                }
+                const cust = customerMap.get(t.id);
+                cust.totalItems += t.items;
+                cust.totalAmount += t.amount;
+                cust.transactions.push(t);
+                cust.modes.add(t.mode);
+            });
+            return Array.from(customerMap.values()).sort((a, b) => b.totalAmount - a.totalAmount);
+        }
+
+        function renderCustomersList() {
+            const customers = getCustomersGrouped();
+            const container = document.getElementById("customersList");
+            if (customers.length === 0) {
+                container.innerHTML = "<div style='padding:2rem;text-align:center;color:gray;'><i class='fas fa-users'></i> No customers yet. Add transactions first.</div>";
+                return;
+            }
+            container.innerHTML = customers.map(cust => `
+                <div class="customer-card">
+                    <div class="flex-between">
+                        <div>
+                            <strong><i class="fas fa-id-card"></i> ID: ${escapeHtml(cust.id)}</strong><br>
+                            <span style="font-size:0.85rem;">👤 ${escapeHtml(cust.name)}</span>
+                        </div>
+                        <div class="customer-total">
+                            💰 TOTAL: ₹${cust.totalAmount.toLocaleString()}
+                        </div>
+                    </div>
+                    <div style="margin: 10px 0; font-size:0.8rem;">
+                        📦 Total Items: ${cust.totalItems} | 🛒 Modes: ${Array.from(cust.modes).join(' + ')} | 📋 Transactions: ${cust.transactions.length}
+                    </div>
+                    <div>
+                        <button class="receipt-btn-sm viewConsolidatedReceipt" data-id="${cust.id}"><i class="fas fa-receipt"></i> View Full Receipt</button>
+                        <button class="delete-btn deleteAllCustomerTrans" data-id="${cust.id}"><i class="fas fa-trash"></i> Delete All</button>
+                    </div>
+                    <details style="margin-top: 10px;">
+                        <summary style="cursor:pointer; font-size:0.75rem; color:#4b5563;">📜 View all ${cust.transactions.length} transactions</summary>
+                        <table class="trans-table" style="margin-top:8px;">
+                            <thead><tr><th>Date</th><th>Time</th><th>Items</th><th>Amount</th><th>Mode</th></tr></thead>
+                            <tbody>
+                                ${cust.transactions.map(t => `<tr><td>${t.date}</td><td>${t.time}</td><td>${t.items}</td><td>₹${t.amount}</td><td>${t.mode}</td></tr>`).join('')}
+                            </tbody>
+                        </table>
+                    </details>
+                </div>
+            `).join('');
+
+            document.querySelectorAll('.viewConsolidatedReceipt').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const custId = btn.dataset.id;
+                    const customer = getCustomersGrouped().find(c => c.id === custId);
+                    if (customer) showProfessionalReceipt(customer);
+                });
+            });
+
+            document.querySelectorAll('.deleteAllCustomerTrans').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const custId = btn.dataset.id;
+                    if (confirm(`⚠️ Delete ALL transactions for customer ID: ${custId}? This cannot be undone.`)) {
+                        allTransactions = allTransactions.filter(t => t.id !== custId);
+                        saveUserData();
+                        renderAll();
+                    }
+                });
+            });
+        }
+
+        function showProfessionalReceipt(customer) {
+            const modal = document.getElementById("receiptModal");
+            const inner = document.getElementById("modalReceiptInner");
+            const now = new Date();
+            const totalAmount = customer.totalAmount;
+            const modes = Array.from(customer.modes).join(" & ");
+            
+            let transactionsHtml = "";
+            customer.transactions.forEach(t => {
+                transactionsHtml += `
+                    <div class="receipt-row">
+                        <span>${t.date} | ${t.time}</span>
+                        <span>${t.items} pcs</span>
+                        <span>${t.mode}</span>
+                        <span><strong>₹${t.amount}</strong></span>
+                    </div>
+                `;
+            });
+
+            inner.innerHTML = `
+                <div class="professional-receipt" id="receiptPrintArea">
+                    <div class="receipt-header">
+                        <h1><i class="fas fa-store"></i> PROLEDGER</h1>
+                        <p>Official Payment Receipt</p>
+                        <p style="font-size:0.8rem; color:#6b7280;">${now.toLocaleString()}</p>
+                    </div>
+                    
+                    <div class="receipt-details">
+                        <div class="receipt-row">
+                            <span><strong>Receipt No:</strong></span>
+                            <span>#${customer.id.slice(-8)}</span>
+                        </div>
+                        <div class="receipt-row">
+                            <span><strong>Customer ID:</strong></span>
+                            <span>${escapeHtml(customer.id)}</span>
+                        </div>
+                        <div class="receipt-row">
+                            <span><strong>Customer Name:</strong></span>
+                            <span>${escapeHtml(customer.name)}</span>
+                        </div>
+                    </div>
+
+                    <div style="background:#f0fdf4; padding:15px; border-radius:12px; margin:15px 0;">
+                        <div class="receipt-row">
+                            <span><strong>📦 Total Items:</strong></span>
+                            <span>${customer.totalItems} pcs</span>
+                        </div>
+                        <div class="receipt-row">
+                            <span><strong>🛒 Payment Modes:</strong></span>
+                            <span>${modes}</span>
+                        </div>
+                        <div class="receipt-row">
+                            <span><strong>📋 Total Transactions:</strong></span>
+                            <span>${customer.transactions.length}</span>
+                        </div>
+                        <div class="receipt-row" style="border-top:2px solid #10b981; margin-top:8px; padding-top:8px;">
+                            <span><strong>💰 GRAND TOTAL:</strong></span>
+                            <span style="font-size:1.3rem; font-weight:800; color:#1e3a5f;">₹${totalAmount.toLocaleString()}</span>
+                        </div>
+                    </div>
+
+                    <h4 style="margin: 15px 0 10px 0;">📜 Transaction History</h4>
+                    <div style="background:#f8fafc; border-radius:12px; padding:10px;">
+                        ${transactionsHtml}
+                    </div>
+
+                    <div style="margin-top: 20px; padding-top: 15px; border-top: 2px dashed #cbd5e1; text-align: center; font-size:0.7rem; color:#6b7280;">
+                        <i class="fas fa-check-circle"></i> This is a computer generated consolidated receipt.<br>
+                        Thank you for your business!
+                    </div>
+                </div>
+                <div class="flex-between" style="margin-top: 1.5rem;">
+                    <button id="printReceiptBtn" style="background:#10b981; flex:1; margin-right:8px;"><i class="fas fa-print"></i> Print Receipt</button>
+                    <button id="downloadReceiptBtn" style="background:#3b82f6; flex:1;"><i class="fas fa-download"></i> Download PNG</button>
+                    <button onclick="closeReceiptModal()" style="background:#6b7280;">Close</button>
+                </div>
+            `;
+            modal.style.display = 'flex';
+
+            document.getElementById("printReceiptBtn")?.addEventListener('click', () => {
+                const win = window.open('', '_blank');
+                const content = document.getElementById("receiptPrintArea").cloneNode(true);
+                win.document.write(`<html><head><title>Receipt_${customer.id}</title>
+                    <style>
+                        body{font-family:'Inter',sans-serif;padding:2rem;}
+                        .professional-receipt{max-width:600px;margin:auto;}
+                        .receipt-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #e2e8f0;}
+                        .receipt-header{text-align:center;border-bottom:2px solid #1e3a5f;padding-bottom:1rem;}
+                    </style>
+                </head><body>${content.outerHTML}</body></html>`);
+                win.document.close();
+                win.print();
+            });
+
+            document.getElementById("downloadReceiptBtn")?.addEventListener('click', () => {
+                html2canvas(document.getElementById("receiptPrintArea"), { scale: 2, backgroundColor: '#ffffff' }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = `receipt_${customer.id}.png`;
+                    link.href = canvas.toDataURL();
+                    link.click();
+                });
+            });
+        }
+
+        function renderExpenses() {
+            const container = document.getElementById("expenseList");
+            if (expenses.length === 0) {
+                container.innerHTML = "<div style='padding:2rem;text-align:center;color:gray;'><i class='fas fa-receipt'></i> No expenses added</div>";
+                return;
+            }
+            container.innerHTML = expenses.map((exp, idx) => `
+                <div class="expense-item">
+                    <div class="flex-between">
+                        <div><strong>${escapeHtml(exp.reason)}</strong> - ₹${exp.amount}</div>
+                        <button class="delete-btn" onclick="window.deleteExpenseFn(${idx})"><i class="fas fa-trash"></i></button>
+                    </div>
+                    <div style="font-size:0.7rem; margin-top:5px;">📅 ${exp.date} | 🕒 ${exp.time}</div>
+                </div>
+            `).join('');
+        }
+
+        function updateStats() {
+            const totalItems = allTransactions.reduce((s, t) => s + t.items, 0);
+            const onlineIncome = allTransactions.filter(t => t.mode === 'Online').reduce((s, t) => s + t.amount, 0);
+            const offlineIncome = allTransactions.filter(t => t.mode === 'Offline').reduce((s, t) => s + t.amount, 0);
+            const totalExpense = expenses.reduce((s, e) => s + e.amount, 0);
+            const uniqueCustomers = new Set(allTransactions.map(t => t.id)).size;
+            const net = (onlineIncome + offlineIncome) - totalExpense;
+
+            document.getElementById("totalItems").innerText = totalItems;
+            document.getElementById("totalOnline").innerText = "₹" + onlineIncome.toLocaleString();
+            document.getElementById("totalOffline").innerText = "₹" + offlineIncome.toLocaleString();
+            document.getElementById("totalCustomers").innerText = uniqueCustomers;
+            document.getElementById("netProfit").innerText = "₹" + net.toLocaleString();
+        }
+
+        function getTodayTransactions() {
+            const today = getCurrentDateStr();
+            return allTransactions.filter(t => t.date === today);
+        }
+
+        function getTodayExpenses() {
+            const today = getCurrentDateStr();
+            return expenses.filter(e => e.date === today);
+        }
+
+        function getMonthTransactions() {
+            const month = getCurrentMonthStr();
+            return allTransactions.filter(t => t.date.startsWith(month));
+        }
+
+        function getMonthExpenses() {
+            const month = getCurrentMonthStr();
+            return expenses.filter(e => e.date.startsWith(month));
+        }
+
+        function refreshReports() {
+            const todayTrans = getTodayTransactions();
+            const todayExp = getTodayExpenses();
+            const todayIncome = todayTrans.reduce((s, t) => s + t.amount, 0);
+            const todayExpTotal = todayExp.reduce((s, e) => s + e.amount, 0);
+            document.getElementById("todayReportContainer").innerHTML = `
+                <div><strong>📅 ${getCurrentDateStr()}</strong> | 🕒 ${getCurrentTimeStr()}</div>
+                <div class="flex-between" style="margin:10px 0;"><span>💰 Income: ₹${todayIncome.toLocaleString()}</span><span>💸 Expense: ₹${todayExpTotal.toLocaleString()}</span><span>📈 Net: ₹${(todayIncome - todayExpTotal).toLocaleString()}</span></div>
+                <details><summary style="cursor:pointer;">📋 Transactions (${todayTrans.length})</summary><div style="margin-top:8px;">${todayTrans.map(t => `<div>🕒 ${t.time} | ${escapeHtml(t.name)} | ₹${t.amount} | ${t.mode}</div>`).join('') || '<div>No transactions</div>'}</div></details>
+                <details><summary style="cursor:pointer; margin-top:8px;">💸 Expenses (${todayExp.length})</summary><div style="margin-top:8px;">${todayExp.map(e => `<div>${e.time} | ${escapeHtml(e.reason)}: ₹${e.amount}</div>`).join('') || '<div>No expenses</div>'}</div></details>
+            `;
+
+            const monthTrans = getMonthTransactions();
+            const monthExp = getMonthExpenses();
+            const monthIncome = monthTrans.reduce((s, t) => s + t.amount, 0);
+            const monthExpTotal = monthExp.reduce((s, e) => s + e.amount, 0);
+            document.getElementById("monthReportContainer").innerHTML = `
+                <div><strong>📆 ${getCurrentMonthStr()}</strong></div>
+                <div class="flex-between" style="margin:10px 0;"><span>💰 Income: ₹${monthIncome.toLocaleString()}</span><span>💸 Expense: ₹${monthExpTotal.toLocaleString()}</span><span>📈 Net: ₹${(monthIncome - monthExpTotal).toLocaleString()}</span></div>
+                <details><summary style="cursor:pointer;">📋 Transactions (${monthTrans.length})</summary><div style="margin-top:8px; max-height:200px; overflow-y:auto;">${monthTrans.slice(0,30).map(t => `<div>📅 ${t.date} ${t.time} | ${escapeHtml(t.name)} | ₹${t.amount}</div>`).join('') || '<div>No transactions</div>'}</div></details>
+                <details><summary style="cursor:pointer; margin-top:8px;">💸 Expenses (${monthExp.length})</summary><div style="margin-top:8px;">${monthExp.map(e => `<div>${e.date} | ${escapeHtml(e.reason)}: ₹${e.amount}</div>`).join('') || '<div>No expenses</div>'}</div></details>
+            `;
+        }
+
+        function printTodayReport() { printReportWindow("Daily Report", getTodayTransactions(), getTodayExpenses()); }
+        function printMonthlyReport() { printReportWindow("Monthly Report", getMonthTransactions(), getMonthExpenses()); }
+
+        function printReportWindow(title, transactions, expensesList) {
+            const win = window.open('', '_blank');
+            const totalIncome = transactions.reduce((s, t) => s + t.amount, 0);
+            const totalExpense = expensesList.reduce((s, e) => s + e.amount, 0);
+            win.document.write(`
+                <html><head><title>${title}</title>
+                <style>
+                    body{font-family:'Inter',sans-serif;padding:2rem;}
+                    table{border-collapse:collapse;width:100%;margin:1rem 0;}
+                    td,th{border:1px solid #ccc;padding:8px;text-align:left;}
+                    .header{text-align:center;border-bottom:2px solid #1e3a5f;padding-bottom:1rem;margin-bottom:1rem;}
+                </style>
+                </head><body>
+                <div class="header"><h2>ProLedger - ${title}</h2><p>Generated: ${new Date().toLocaleString()}</p><p>User: ${currentUser.fullname}</p></div>
+                <h3>Summary</h3>
+                <p><strong>Total Income:</strong> ₹${totalIncome.toLocaleString()} | <strong>Total Expense:</strong> ₹${totalExpense.toLocaleString()} | <strong>Net Profit:</strong> ₹${(totalIncome - totalExpense).toLocaleString()}</p>
+                <h3>Transactions</h3>
+                <table><thead><tr><th>Date</th><th>Time</th><th>Customer ID</th><th>Name</th><th>Items</th><th>Amount</th><th>Mode</th></tr></thead>
+                <tbody>${transactions.map(t => `<tr><td>${t.date}</td><td>${t.time}</td><td>${t.id}</td><td>${t.name}</td><td>${t.items}</td><td>₹${t.amount}</td><td>${t.mode}</td></tr>`).join('')}</tbody></table>
+                <h3>Expenses</h3>
+                <table><thead><tr><th>Date</th><th>Time</th><th>Reason</th><th>Amount</th></tr></thead>
+                <tbody>${expensesList.map(e => `<tr><td>${e.date}</td><td>${e.time}</td><td>${e.reason}</td><td>₹${e.amount}</td></tr>`).join('')}</tbody></table>
+                <footer style="margin-top:2rem; text-align:center; font-size:0.7rem;">ProLedger - Official Report</footer>
+                </body></html>
+            `);
+            win.document.close();
+            win.print();
+        }
+
+        function renderAll() {
+            renderCustomersList();
+            renderExpenses();
+            updateStats();
+            refreshReports();
+        }
+
+        function updateLiveClock() {
+            const now = new Date();
+            document.getElementById("liveDateTime").innerHTML = `<i class="fas fa-calendar-alt"></i> ${now.toLocaleDateString('en-IN')} | <i class="fas fa-clock"></i> ${now.toLocaleTimeString('en-IN')}`;
+        }
+
+        function escapeHtml(str) { return String(str).replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+        function closeReceiptModal() { document.getElementById("receiptModal").style.display = "none"; }
+        window.deleteExpenseFn = (idx) => deleteExpense(idx);
+        window.closeReceiptModal = closeReceiptModal;
+
+        function initializeApp() {
+            renderAll();
+            updateLiveClock();
+            setInterval(updateLiveClock, 1000);
+            setInterval(() => { refreshReports(); updateStats(); }, 3000);
+
+            document.getElementById("addOnlineBtn").onclick = () => {
+                addTransaction('online', document.getElementById("onlineName").value, document.getElementById("onlineCustomId").value, document.getElementById("onlineQty").value, document.getElementById("onlineAmount").value);
+                document.getElementById("onlineName").value = ""; document.getElementById("onlineCustomId").value = ""; document.getElementById("onlineQty").value = ""; document.getElementById("onlineAmount").value = "";
+            };
+            document.getElementById("addOfflineBtn").onclick = () => {
+                addTransaction('offline', document.getElementById("offlineName").value, document.getElementById("offlineCustomId").value, document.getElementById("offlineQty").value, document.getElementById("offlineAmount").value);
+                document.getElementById("offlineName").value = ""; document.getElementById("offlineCustomId").value = ""; document.getElementById("offlineQty").value = ""; document.getElementById("offlineAmount").value = "";
+            };
+            document.getElementById("addExpenseBtn").onclick = () => {
+                addExpense(document.getElementById("expenseReason").value, document.getElementById("expenseAmount").value);
+                document.getElementById("expenseReason").value = ""; document.getElementById("expenseAmount").value = "";
+            };
+            document.getElementById("printTodayBtn").onclick = printTodayReport;
+            document.getElementById("printMonthBtn").onclick = printMonthlyReport;
+
+            document.querySelectorAll(".tab-btn").forEach(btn => {
+                btn.onclick = () => {
+                    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove('active-pane'));
+                    document.getElementById(btn.dataset.tab).classList.add('active-pane');
+                    if (btn.dataset.tab === 'customers') renderCustomersList();
+                    if (btn.dataset.tab === 'reports') refreshReports();
+                };
+            });
+            window.onclick = (e) => { if (e.target === document.getElementById("receiptModal")) closeReceiptModal(); };
+        }
+
+        // Event Listeners
+        document.getElementById("registerBtn").addEventListener("click", register);
+        document.getElementById("loginBtn").addEventListener("click", login);
+        document.getElementById("logoutBtn").addEventListener("click", logout);
+        document.getElementById("gotoLogin").addEventListener("click", showLogin);
+        document.getElementById("gotoRegister").addEventListener("click", showRegister);
+        
+        document.getElementById("loginPassword").addEventListener("keypress", (e) => { if (e.key === "Enter") login(); });
+        document.getElementById("regConfirmPassword").addEventListener("keypress", (e) => { if (e.key === "Enter") register(); });
+
+        checkAutoLogin();
+    </script>
+</body>
+</html>
