@@ -1,0 +1,18 @@
+proledger-accounting-system/
+│
+├── index.html                    # Main application file
+├── README.md                     # Documentation
+├── LICENSE                       # MIT License
+├── .gitignore                    # Git ignore file
+│
+├── docs/                         # Documentation folder
+│   ├── installation.md
+│   ├── user-guide.md
+│   └── api-reference.md
+│
+├── screenshots/                  # Screenshots for README
+│   ├── login.png
+│   ├── dashboard.png
+│   └── receipt.png
+│
+└── CHANGELOG.md                  # Version history
